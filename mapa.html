@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Celostránková mapa s Leaflet.js</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 50px;
+        }
+        .header {
+            background-color: black;
+            padding: 10px;
+            position: absolute;
+            width: 100%;
+            z-index: 1000;
+            text-align: center;
+        }
+      
+        button {
+            margin: 0 10px;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button onclick="goToLocation('Praha')">Praha</button>
+        <button onclick="goToLocation('Brno')">Brno</button>
+        <button onclick="goToLocation('New York')">New York</button>
+        <button onclick="zoomIn()">+ Zvětšit</button>
+        <button onclick="zoomOut()">- Zmenšit</button>
+        <button onclick="getCurrentLocation()">Aktuální poloha</button>
+    </div>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        let map;
+        let marker;
+
+        function initMap() {
+            map = L.map('map').setView([50.0755, 14.4378], 8); 
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            marker = L.marker([50.0755, 14.4378]).addTo(map);
+        }
+
+        function goToLocation(location) {
+            let position;
+            switch (location) {
+                case 'Praha':
+                    position = [50.0755, 14.4378];
+                    break;
+                case 'Brno':
+                    position = [49.1951, 16.6068];
+                    break;
+                case 'New York':
+                    position = [40.7128, -74.0060];
+                    break;
+                default:
+                    position = [50.0755, 14.4378];
+            }
+
+            map.setView(position, 12);
+            marker.setLatLng(position);
+        }
+
+        function zoomIn() {
+            map.zoomIn();
+        }
+
+        function zoomOut() {
+            map.zoomOut();
+        }
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const userLocation = [position.coords.latitude, position.coords.longitude];
+                    map.setView(userLocation, 12);
+                    marker.setLatLng(userLocation);
+                }, () => {
+                    alert("Nelze získat vaši polohu.");
+                });
+            } else {
+                alert("Geolokace není v tomto prohlížeči podporována.");
+            }
+        }
+
+        initMap();
+    </script>
+</body>
+</html>
